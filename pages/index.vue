@@ -32,7 +32,7 @@
                   <b-form-select-option value="AT">Alta Tensão</b-form-select-option>
                   <b-form-select-option value="BT">Baixa Tensão</b-form-select-option>
                   <b-form-select-option value="FCTE">Fibra Optica Copel</b-form-select-option>
-                  <b-form-select-option value="FOP">Fibra Optica Operadoras</b-form-select-option>
+                  <b-form-select-option value="FOP">Cabo de Outras Operadoras</b-form-select-option>
                   <b-form-select-option value="TRAFO">Transformador</b-form-select-option>
                   <b-form-select-option value="LUMINARIA">Luminária</b-form-select-option>
                   <b-form-select-option value="CHAVE">Chave</b-form-select-option>
@@ -60,7 +60,16 @@
 
 
               <b-form-group id="input-group-cabo" label="Cabo:" label-for="input-cabo"
-                v-if="ponto.tipo=='FCTE' || ponto.tipo=='FOP'" label-size="sm" label-align="left" label-class="mb-0"
+                v-if="ponto.tipo=='FCTE'" label-size="sm" label-align="left" label-class="mb-0"
+                class="mb-1">
+                <b-form-select v-model="ponto.cabo" class="mb-0"
+                  :options="fibras.filter(x=>x.copel == true).map(x=>{ return {value:x, text:x.nome} })">
+                </b-form-select>
+              </b-form-group>
+
+
+              <b-form-group id="input-group-cabo" label="Cabo:" label-for="input-cabo"
+                v-if="ponto.tipo=='FOP'" label-size="sm" label-align="left" label-class="mb-0"
                 class="mb-1">
                 <b-form-select v-model="ponto.cabo" class="mb-0"
                   :options="fibras.map(x=>{ return {value:x, text:x.nome} })">
@@ -168,6 +177,7 @@
     </div>
 
 
+  <p>Projeto de código aberto, contribua em <a href="https://github.com/foadmk/calculadora-dis">https://github.com/foadmk/calculadora-dis</a></p>
   </div>
 </template>
 
@@ -260,6 +270,9 @@
         })
         let vr = this.fnResultante()
         if (maxMod < vr.mod) maxMod = vr.mod
+        let vv = this.fnCalculaVento()
+        let vp = this.fnCalculaVentoPoste()
+        if (maxMod < (vv.mod + vp.mod)) maxMod = (vv.mod + vp.mod)
         let scale = maxMod / (this.w / 2 - 30)
         sketch.background('white');
         sketch.translate(this.h / 2, this.w / 2)
@@ -293,6 +306,20 @@
         sketch.line(0, 0, mod, 0)
         sketch.triangle(mod, 0, -5 + mod, -5, -5 + mod, +5)
         sketch.pop()
+
+
+        sketch.stroke(0, 0, 255);
+        sketch.noFill();
+        sketch.beginShape();
+        vv.ventos.forEach((v,i)=>{
+          mod = (v.momento + vp.mod) / scale
+          sketch.vertex(mod*Math.cos(-v.angulo * Math.PI / 180), mod*Math.sin(-v.angulo * Math.PI / 180))
+        })
+        vv.ventos.forEach((v,i)=>{
+          mod = (v.momento + vp.mod) / scale
+          sketch.vertex(mod*Math.cos((-v.angulo+180) * Math.PI / 180), mod*Math.sin((-v.angulo+180) * Math.PI / 180))
+        })
+        sketch.endShape();
 
       },
       adicionarComponente() {
@@ -416,7 +443,9 @@
 
         let maxVento = 0
         let maxVentoAng = 0
-        for (let angVento = 0; angVento <= 90; angVento += 1) {
+
+        let ventos = []
+        for (let angVento = 0; angVento <= 180; angVento += 1) {
 
           let mVento = 0
           this.poste.forcas.forEach((ponto, i) => {
@@ -425,6 +454,7 @@
                 .altura)
             }
           })
+            ventos.push({angulo: angVento, momento: mVento})
 
 
           if (mVento > maxVento) {
@@ -437,7 +467,8 @@
           x: (maxVento * Math.cos(maxVentoAng * Math.PI / 180)),
           y: (maxVento * Math.sin(maxVentoAng * Math.PI / 180)),
           mod: maxVento,
-          ang: maxVentoAng
+          angulo: maxVentoAng,
+          ventos: ventos
         }
 
       }
