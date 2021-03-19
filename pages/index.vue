@@ -272,7 +272,8 @@
         if (maxMod < vr.mod) maxMod = vr.mod
         let vv = this.fnCalculaVento()
         let vp = this.fnCalculaVentoPoste()
-        if (maxMod < (vv.mod + vp.mod)) maxMod = (vv.mod + vp.mod)
+        let vt = this.fnCalculaVentoTrafo()
+        if (maxMod < (vv.mod + vp.mod + vt.mod)) maxMod = (vv.mod + vp.mod)
         let scale = maxMod / (this.w / 2 - 30)
         sketch.background('white');
         sketch.translate(this.h / 2, this.w / 2)
@@ -312,11 +313,11 @@
         sketch.noFill();
         sketch.beginShape();
         vv.ventos.forEach((v,i)=>{
-          mod = (v.momento + vp.mod) / scale
+          mod = (v.momento + vp.mod + vt.mod) / scale
           sketch.vertex(mod*Math.cos(-v.angulo * Math.PI / 180), mod*Math.sin(-v.angulo * Math.PI / 180))
         })
         vv.ventos.forEach((v,i)=>{
-          mod = (v.momento + vp.mod) / scale
+          mod = (v.momento + vp.mod + vt.mod) / scale
           sketch.vertex(mod*Math.cos((-v.angulo+180) * Math.PI / 180), mod*Math.sin((-v.angulo+180) * Math.PI / 180))
         })
         sketch.endShape();
