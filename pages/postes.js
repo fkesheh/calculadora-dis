@@ -8,6 +8,7 @@ export default [{
     topo: 0.12,
     base: 0.288,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo D - 150 daN - 10,5 m'
   },
   {
@@ -20,6 +21,7 @@ export default [{
     topo: 0.14,
     base: 0.434,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B - 300 daN - 10,5 m'
   },
   {
@@ -32,6 +34,7 @@ export default [{
     topo: 0.14,
     base: 0.434,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B - 600 daN - 10,5 m'
   },
   {
@@ -44,6 +47,7 @@ export default [{
     topo: 0.182,
     base: 0.476,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B-1,5 - 1000 daN - 10,5 m'
   },
   {
@@ -56,6 +60,7 @@ export default [{
     topo: 0.266,
     base: 0.56,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B-4,5 - 2000 daN - 10,5 m'
   },
   {
@@ -68,6 +73,7 @@ export default [{
     topo: 0.12,
     base: 0.312,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo D - 200 daN - 12 m'
   },
   {
@@ -80,6 +86,7 @@ export default [{
     topo: 0.14,
     base: 0.476,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B - 300 daN - 12 m'
   },
   {
@@ -92,6 +99,7 @@ export default [{
     topo: 0.14,
     base: 0.476,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B - 600 daN - 12 m'
   },
   {
@@ -104,6 +112,7 @@ export default [{
     topo: 0.182,
     base: 0.518,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B-1,5 - 1000 daN - 12 m'
   },
   {
@@ -116,6 +125,7 @@ export default [{
     topo: 0.266,
     base: 0.602,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B-4,5 - 2000 daN - 12 m'
   },
   {
@@ -128,6 +138,7 @@ export default [{
     topo: 0.308,
     base: 0.644,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B-6 - 3000 daN - 12 m'
   },
   {
@@ -140,6 +151,7 @@ export default [{
     topo: 0.14,
     base: 0.518,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B - 600 daN - 13,5 m'
   },
   {
@@ -152,6 +164,7 @@ export default [{
     topo: 0.182,
     base: 0.56,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B-1,5 - 1000 daN - 13,5 m'
   },
   {
@@ -164,6 +177,7 @@ export default [{
     topo: 0.266,
     base: 0.644,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B-4,5 - 2000 daN - 13,5 m'
   },
   {
@@ -176,6 +190,7 @@ export default [{
     topo: 0.308,
     base: 0.686,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B-6 - 3000 daN - 13,5 m'
   },
   {
@@ -188,6 +203,7 @@ export default [{
     topo: 0.14,
     base: 0.56,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B - 600 daN - 15 m'
   },
   {
@@ -200,6 +216,7 @@ export default [{
     topo: 0.14,
     base: 0.644,
     k: 0.00754,
+    classe: 'Duplo-T',
     nome: 'Tipo B - 600 daN - 18 m'
   },
 ]
