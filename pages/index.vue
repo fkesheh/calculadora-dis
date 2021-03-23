@@ -188,10 +188,10 @@
       <b-card border-variant="primary" header-bg-variant="primary" header-text-variant="white" align="center">
 
         <template #header>
-          <h4 class="mb-0">Memória de Cálculo:</h4>
+          <h4 class="mb-0">Memória de Cálculo: <b-button variant="info" @click="copiarMemoria">Copiar</b-button></h4>          
         </template>
         <b-card-text>
-          <pre>{{ memoriaDeCalculo }}</pre>
+          <div ref='memoria' v-html="memoriaDeCalculo"></div>
         </b-card-text>
       </b-card>
     </div>
@@ -217,6 +217,7 @@
         h: 360,
         w: 360,
         vento: 60,
+        separator: '</td></tr><tr><td>',
         tipos: {
           'AT': 'Alta Tensão',
           'BT': 'Baixa Tensão',
@@ -291,11 +292,9 @@
           p.equip.d = parseFloat(p.equip.d)
           p.deriv.tracao = parseFloat(p.deriv.tracao)
           p.deriv.h = parseFloat(p.deriv.h)
-          texto.push(
-            "----------------------------------------------------------------------------------------------------------------"
-          );
-          texto.push(`Componente ${i+1} - ${this.tipos[p.tipo]}`)
-          if ((p.tipo == 'AT' || p.tipo == 'BT') && p.cabo && (p.cabo.altaTensao && p.tipo == 'AT') &&  (p.cabo.baixaTensao && p.tipo == 'BT')) {
+
+          texto.push(`<strong>Componente ${i+1} - ${this.tipos[p.tipo]}</strong>`)
+          if ((p.tipo == 'AT' || p.tipo == 'BT') && p.cabo && p.cabo.tracao) {
             if (p.cabo.multiplos) {
               texto.push(`Cabo: ${p.qtCabos} x ${p.cabo.nome} - Norma ${p.cabo.norma}`)
               texto.push(
@@ -317,20 +316,17 @@
             if (!p.cabo.multiplos) {
               p.qtCabos = 1
             }
-            if(p.cabo && p.cabo.densidadeLinear){
-            texto.push(
-              `Cabo: ${p.qtCabos} x ${p.cabo.nome} - Densidade Linear ${p.cabo.densidadeLinear.toFixed(3)} kg/m - Diâmetro: ${p.cabo.diametro.toFixed(3)} m`
-            )
-            texto.push(
-              `Tração: ${p.qtCabos} x Densidade x Vão² / 8 x flecha(1%) = ${p.qtCabos} x ${p.cabo.densidadeLinear.toFixed(3)} x ${p.vaoRegulador.toFixed(2)}² / ( 8 x 0,01 x ${p.vaoRegulador.toFixed(2)}) = ${(p.qtCabos * p.cabo.densidadeLinear * p.vaoRegulador ** 2 / (8* 0.01 * p.vaoRegulador)).toFixed(2)} daN`
-            )
-            texto.push(
-              `Momento: Tração x Altura = ${(p.qtCabos * p.cabo.densidadeLinear * p.vaoRegulador ** 2 / (8* 0.01 * p.vaoRegulador)).toFixed(2)} x ${p.altura.toFixed(2)} = ${(this.fnCalculaTracao(p)).toFixed(2)} daN.m - Ângulo: ${p.angulo.toFixed(2)}`
-            )
+            if (p.cabo && p.cabo.densidadeLinear) {
+              texto.push(
+                `Cabo: ${p.qtCabos} x ${p.cabo.nome} - Densidade Linear ${p.cabo.densidadeLinear.toFixed(3)} kg/m - Diâmetro: ${p.cabo.diametro.toFixed(3)} m`
+              )
+              texto.push(
+                `Tração: ${p.qtCabos} x Densidade x Vão² / 8 x flecha(1%) = ${p.qtCabos} x ${p.cabo.densidadeLinear.toFixed(3)} x ${p.vaoRegulador.toFixed(2)}² / ( 8 x 0,01 x ${p.vaoRegulador.toFixed(2)}) = ${(p.qtCabos * p.cabo.densidadeLinear * p.vaoRegulador ** 2 / (8* 0.01 * p.vaoRegulador)).toFixed(2)} daN`
+              )
+              texto.push(
+                `Momento: Tração x Altura = ${(p.qtCabos * p.cabo.densidadeLinear * p.vaoRegulador ** 2 / (8* 0.01 * p.vaoRegulador)).toFixed(2)} x ${p.altura.toFixed(2)} = ${(this.fnCalculaTracao(p)).toFixed(2)} daN.m - Ângulo: ${p.angulo.toFixed(2)}`
+              )
             }
-            texto.push(
-              "----------------------------------------------------------------------------------------------------------------"
-            )
             texto.push(
               `Pressão do Vento (Pv):  k x Vento² = 0.00471 x ${this.vento}² = ${(0.00471 * (this.vento ** 2)).toFixed(3)} daN / m²`
             )
@@ -350,9 +346,7 @@
             )
           }
           if (p.tipo == 'TRAFO') {
-            texto.push(
-              "----------------------------------------------------------------------------------------------------------------"
-            )
+
             texto.push(
               `Momento devido ao Vento:  k x Vento² x AlturaFixação x ÁreaDoTrafo(XY)`
             )
@@ -365,20 +359,16 @@
               `Momento: Tração x Altura = ${p.deriv.tracao.toFixed(2)} x ${p.deriv.h.toFixed(2)} = ${(p.deriv.tracao * p.deriv.h).toFixed(2)} daN.m  - Ângulo: ${p.angulo.toFixed(2)}`
             )
           }
-          texto.push(
-            "----------------------------------------------------------------------------------------------------------------"
-          )
 
+                  texto.push(
+          this.separator
+        )
 
         })
 
         let alturaUtil = this.poste.modelo.altura * 0.9 - 0.6
 
-
-        texto.push(
-          "----------------------------------------------------------------------------------------------------------------"
-        )
-        texto.push("Vento no Poste")
+        texto.push("<strong>Vento no Poste</strong>")
         texto.push(
           `Momento do Vento: ( k / 6 ) x Vento² x AlturaPoste² x ( 2 x LarguraTopo + LarguraBase)`
         )
@@ -386,13 +376,10 @@
           `Momento do Vento: ( ${this.poste.modelo.k} / 6 ) x 60² x ${(alturaUtil).toFixed(2)}² x ( 2 x ${this.poste.modelo.topo} + ${this.poste.modelo.base} ) = ${this.resultanteVentoNoPoste.toFixed(2)} daN.m`
         )
         texto.push(
-          "----------------------------------------------------------------------------------------------------------------"
+          this.separator
         )
 
-        texto.push(
-          "----------------------------------------------------------------------------------------------------------------"
-        )
-        texto.push("Resultante dos Cabos e Equipamentos")
+        texto.push("<strong>Resultante dos Cabos e Equipamentos</strong>")
 
         this.poste.forcas.forEach((p, i) => {
           let t = this.fnVetorTracao(p)
@@ -405,14 +392,10 @@
           `Resultante: ${res.mod.toFixed(2)} daN.m - Ângulo ${res.angulo.toFixed(2)} - X: ${res.x.toFixed(2)} - Y: ${res.y.toFixed(2)}`
         )
         texto.push(
-          "----------------------------------------------------------------------------------------------------------------"
+          this.separator
         )
 
-
-        texto.push(
-          "----------------------------------------------------------------------------------------------------------------"
-        )
-        texto.push("Momento Aplicado - MAS")
+        texto.push("<strong>Momento Aplicado - MAS</strong>")
         texto.push(
           `Resultante dos Cabos e Equipamentos: ${res.mod.toFixed(2)} daN.m`
         )
@@ -429,14 +412,10 @@
           `Momento Aplicado: ${this.momentoTotal.toFixed(2)} daN.m`
         )
         texto.push(
-          "----------------------------------------------------------------------------------------------------------------"
+          this.separator
         )
 
-
-        texto.push(
-          "----------------------------------------------------------------------------------------------------------------"
-        )
-        texto.push("Momento Resistente - MRSA")
+        texto.push("<strong>Momento Resistente - MRSA</strong>")
         texto.push(
           `Momento Resistente: 1.40 x Resistência Nominal x (Altura Util - 0.2)`
         )
@@ -461,25 +440,20 @@
           )
         }
         texto.push(
-          "----------------------------------------------------------------------------------------------------------------"
+          this.separator
         )
-        texto.push(
-          "----------------------------------------------------------------------------------------------------------------"
-        )
+
         if (mrsa * fr >= this.momentoTotal) {
           texto.push(
-            `Conclusão: Poste ${this.poste.modelo.nome} estável (MRSA>=MAS)`
+            `<strong>Conclusão: Poste ${this.poste.modelo.nome} estável (MRSA maior ou igual a MAS)</strong>`
           )
         } else {
           texto.push(
-            `Conclusão: Poste ${this.poste.modelo.nome} instável (MRSA<MAS)`
+            `<strong>Conclusão: Poste ${this.poste.modelo.nome} instável (MRSA menor que MAS)</strong>`
           )
         }
-        texto.push(
-          "----------------------------------------------------------------------------------------------------------------"
-        )
 
-        return texto.join("\r\n")
+        return "<table><tr><td>" + texto.join("<br>").replaceAll(this.separator + '<br>', this.separator) + "</td></tr></table>"
       }
     },
     methods: {
@@ -610,14 +584,32 @@
           if (x.tipo == 'AT') this.poste.forcas[i].altura = this.fnAlturaPadrao(x.tipo)
         })
       },
-      atualizarAltura(ponto) {    
-         ponto.altura = this.fnAlturaPadrao(ponto.tipo)
+      atualizarAltura(ponto) {
+        ponto.altura = this.fnAlturaPadrao(ponto.tipo)
+      },
+      selectText(element) {
+        var range;
+        if (document.selection) {
+          // IE
+          range = document.body.createTextRange();
+          range.moveToElementText(element);
+          range.select();
+        } else if (window.getSelection) {
+          range = document.createRange();
+          range.selectNode(element);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+        }
+      },
+      copiarMemoria() {
+        this.selectText(this.$refs.memoria)
+        document.execCommand("copy")
       },
       fnRebaterAo1Q(angulo) {
         let a = Math.abs(angulo)
-        if(a <= 90) return a
-        if(a <= 180) return 180 - a
-        if(a <= 270) return a - 180
+        if (a <= 90) return a
+        if (a <= 180) return 180 - a
+        if (a <= 270) return a - 180
         return 360 - a
       },
       fnResultante() {
@@ -769,4 +761,7 @@
     min-height: 100vh;
   }
 
+  tr {
+    border: 1px solid #000;
+  }
 </style>
