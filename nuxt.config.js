@@ -7,7 +7,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'calculadora-dis',
+    title: 'Cálculo de esforços conforme normas da Copel Distribuição',
     htmlAttrs: {
       lang: 'en'
     },

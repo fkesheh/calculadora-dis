@@ -28,7 +28,7 @@
 
               <b-form-group id="input-group-tipo" label="Tipo:" label-for="input-tipo" label-size="sm"
                 label-align="left" label-class="mb-0" class="mb-1">
-                <b-form-select v-model="ponto.tipo" class="mb-0" id="input-tipo" @change="atualizarAlturas">
+                <b-form-select v-model="ponto.tipo" class="mb-0" id="input-tipo" @change="atualizarAltura(ponto)">
                   <b-form-select-option value="AT">Alta Tensão</b-form-select-option>
                   <b-form-select-option value="BT">Baixa Tensão</b-form-select-option>
                   <b-form-select-option value="FCTE">Fibra Optica Copel</b-form-select-option>
@@ -122,6 +122,13 @@
               <b-form-group id="input-group-angulo" label="Ângulo (graus):" label-for="input-angulo" label-size="sm"
                 label-align="left" label-class="mb-0" class="mb-1">
                 <b-form-input type="number" step="0.1" v-model="ponto.angulo" class="mb-0" />
+              </b-form-group>
+
+
+              <b-form-group id="input-group-altura" label="Altura (m):" label-for="input-altura" label-size="sm"
+                label-align="left" label-class="mb-0" class="mb-1"
+                v-if="ponto.tipo!='CHAVE' && ponto.tipo!='LUMINARIA' && ponto.tipo!='TRAFO'">
+                <b-form-input type="number" step="0.01" v-model="ponto.altura" class="mb-0" />
               </b-form-group>
 
             </b-card-text>
@@ -234,14 +241,14 @@
     watch: {
       poste: {
         handler(val) {
-          if(this.sketch) this.sketch.redraw()
+          if (this.sketch) this.sketch.redraw()
           console.log("Redraw")
         },
         deep: true
       },
     },
     mounted() {
-      this.atualizarAlturas()
+      //this.atualizarAlturas()
     },
     computed: {
       resultanteTracao() {
@@ -263,7 +270,7 @@
           if (res.x < 0.001 && res.y < 0.001) {
 
           } else {
-            let angReducao = Math.abs(res.angulo) % 90
+            let angReducao = this.fnRebaterAo1Q(res.angulo)
             fr = 1.0329 * Math.exp(-0.00722 * angReducao);
           }
         }
@@ -278,6 +285,7 @@
         let ventoCabos = this.fnCalculaVento()
         this.poste.forcas.forEach((p, i) => {
           p.angulo = parseFloat(p.angulo)
+          p.altura = parseFloat(p.altura)
           p.vaoRegulador = parseFloat(p.vaoRegulador)
           p.equip.peso = parseFloat(p.equip.peso)
           p.equip.d = parseFloat(p.equip.d)
@@ -287,7 +295,7 @@
             "----------------------------------------------------------------------------------------------------------------"
           );
           texto.push(`Componente ${i+1} - ${this.tipos[p.tipo]}`)
-          if ((p.tipo == 'AT' || p.tipo == 'BT') && p.cabo) {
+          if ((p.tipo == 'AT' || p.tipo == 'BT') && p.cabo && (p.cabo.altaTensao && p.tipo == 'AT') &&  (p.cabo.baixaTensao && p.tipo == 'BT')) {
             if (p.cabo.multiplos) {
               texto.push(`Cabo: ${p.qtCabos} x ${p.cabo.nome} - Norma ${p.cabo.norma}`)
               texto.push(
@@ -309,6 +317,7 @@
             if (!p.cabo.multiplos) {
               p.qtCabos = 1
             }
+            if(p.cabo && p.cabo.densidadeLinear){
             texto.push(
               `Cabo: ${p.qtCabos} x ${p.cabo.nome} - Densidade Linear ${p.cabo.densidadeLinear.toFixed(3)} kg/m - Diâmetro: ${p.cabo.diametro.toFixed(3)} m`
             )
@@ -318,7 +327,7 @@
             texto.push(
               `Momento: Tração x Altura = ${(p.qtCabos * p.cabo.densidadeLinear * p.vaoRegulador ** 2 / (8* 0.01 * p.vaoRegulador)).toFixed(2)} x ${p.altura.toFixed(2)} = ${(this.fnCalculaTracao(p)).toFixed(2)} daN.m - Ângulo: ${p.angulo.toFixed(2)}`
             )
-
+            }
             texto.push(
               "----------------------------------------------------------------------------------------------------------------"
             )
@@ -439,7 +448,7 @@
         if ((Math.abs(res.x) < 0.001 && Math.abs(res.y) < 0.001) || this.poste.modelo.classe == 'Circular') {
 
         } else {
-          let angReducao = Math.abs(res.angulo) % 90
+          let angReducao = this.fnRebaterAo1Q(res.angulo)
           fr = 1.0329 * Math.exp(-0.00722 * angReducao);
           texto.push(
             `Fator de Redução: 1.0329 * EXP(-0.00722 * Angulo) = ${fr.toFixed(2)}`
@@ -483,7 +492,7 @@
           cabo: null,
           qtCabos: 3,
           angulo: 0,
-          altura: 7.30,
+          altura: this.fnAlturaPadrao("AT"),
           vaoRegulador: 40,
           equip: {
             x: 1.3,
@@ -580,18 +589,36 @@
       },
       adicionarComponente() {
         this.poste.forcas.push(this.p0())
-        this.atualizarAlturas()
+        //this.atualizarAlturas()
+      },
+      fnAlturaPadrao(tipo) {
+        if (tipo == "AT") {
+          if (this.poste && this.poste.modelo) {
+            return +(this.poste.modelo.alturaUtil * 0.9 - 0.6 - 0.15).toFixed(2)
+          } else {
+            return 8.70
+          }
+        }
+        if (tipo == "BT") return 7.30
+        if (tipo == "FCTE") return 6.50
+        if (tipo == "FOP") return 5.70
+        if (tipo == "TRAFO") return 6.80
+        if (tipo == "DERIVACAO") return 6.50
       },
       atualizarAlturas() {
         this.poste.forcas.forEach((x, i) => {
-          if (this.poste.modelo) {
-            if (x.tipo == "AT")
-              this.poste.forcas[i].altura = this.poste.modelo.alturaUtil * 0.9 - 0.6 - 0.15
-            if (x.tipo == "BT") this.poste.forcas[i].altura = 7.3
-            if (x.tipo == "FCTE") this.poste.forcas[i].altura = 6.5
-            if (x.tipo == "FOP") this.poste.forcas[i].altura = 5.7
-          }
+          if (x.tipo == 'AT') this.poste.forcas[i].altura = this.fnAlturaPadrao(x.tipo)
         })
+      },
+      atualizarAltura(ponto) {    
+         ponto.altura = this.fnAlturaPadrao(ponto.tipo)
+      },
+      fnRebaterAo1Q(angulo) {
+        let a = Math.abs(angulo)
+        if(a <= 90) return a
+        if(a <= 180) return 180 - a
+        if(a <= 270) return a - 180
+        return 360 - a
       },
       fnResultante() {
         let x = 0;
