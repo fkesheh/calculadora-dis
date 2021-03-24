@@ -1,6 +1,12 @@
 <template>
   <div class="container">
 
+    <b-form-group id="input-group-numposte" label="Número do Poste:" label-for="input-numposte"
+      label-size="sm"
+      label-align="left" label-class="mb-0" class="mb-1">
+      <b-form-input type="number" step="1" v-model="poste.numero" class="mb-0" />
+    </b-form-group>
+
     <b-form-group id="input-group-alturaDoPoste" label="Tipo de Poste:" label-for="input-alturaDoPoste">
       <b-form-select v-model="poste.modelo" class="mb-3" id="input-alturaDoPoste" @change="atualizarAlturas"
         :options="postes.map(x=>{ return {value:x, text:x.nome} })">
@@ -188,12 +194,20 @@
       <b-card border-variant="primary" header-bg-variant="primary" header-text-variant="white" align="center">
 
         <template #header>
-          <h4 class="mb-0">Memória de Cálculo: <b-button variant="info" @click="copiarMemoria">Copiar</b-button></h4>          
+          <h4 class="mb-0">Memória de Cálculo: <b-button variant="info" @click="copiarMemoria">Copiar</b-button>
+          </h4>
         </template>
         <b-card-text>
           <div ref='memoria' v-html="memoriaDeCalculo"></div>
         </b-card-text>
       </b-card>
+
+      <input type="file" class="d-none" ref="myFile" @change="carregarArquivo"><br />
+
+      <b-button variant="primary" @click="salvar">Download</b-button>
+      <b-button variant="secondary" @click="carregar">Carregar</b-button>
+      <b-button variant="danger" @click="limpar">Limpar</b-button>
+
     </div>
 
 
@@ -212,11 +226,12 @@
       'vue-p5': VueP5
     },
     data() {
-      return {
+      return {        
         sketch: null,
         h: 360,
         w: 360,
         vento: 60,
+        text: 'xxx',
         separator: '</td></tr><tr><td>',
         tipos: {
           'AT': 'Alta Tensão',
@@ -232,6 +247,7 @@
         postes: postesLib,
         fibras: fibrasLib,
         poste: {
+          numero: '',
           modelo: postesLib[0],
           forcas: [
             this.p0()
@@ -243,13 +259,19 @@
       poste: {
         handler(val) {
           if (this.sketch) this.sketch.redraw()
-          console.log("Redraw")
+          this.poste.versao = 1
+          localStorage.setItem('dados_v1', JSON.stringify(this.poste));
         },
         deep: true
       },
     },
     mounted() {
       //this.atualizarAlturas()
+      let json = localStorage.getItem('dados_v1');
+      if (json) {
+        let j = JSON.parse(json)
+        if(j.versao == 1) this.carregarV1(j)
+      }
     },
     computed: {
       resultanteTracao() {
@@ -360,9 +382,9 @@
             )
           }
 
-                  texto.push(
-          this.separator
-        )
+          texto.push(
+            this.separator
+          )
 
         })
 
@@ -453,7 +475,8 @@
           )
         }
 
-        return "<table><tr><td>" + texto.join("<br>").replaceAll(this.separator + '<br>', this.separator) + "</td></tr></table>"
+        return "<table><tr><td>" + texto.join("<br>").replaceAll(this.separator + '<br>', this.separator) +
+          "</td></tr></table>"
       }
     },
     methods: {
@@ -486,8 +509,7 @@
       },
       setup(sketch) {
         sketch.createCanvas(this.w, this.h);
-        sketch.background('white');
-        sketch.text('Hello p5!', 20, 20);
+        sketch.background('black');
         sketch.noLoop()
         this.sketch = sketch
       },
@@ -749,6 +771,56 @@
           ventos: ventos
         }
 
+      },
+      carregarV1(res) {
+        this.poste = res
+      },
+      carregar() {
+        this.$refs.myFile.click()
+      },
+      carregarArquivo() {
+        let file = this.$refs.myFile.files[0];
+        //if(!file || file.type !== 'text/plain') return;
+
+        // Credit: https://stackoverflow.com/a/754398/52160
+        let reader = new FileReader();
+        reader.readAsText(file, "UTF-8");
+        reader.onload = evt => {
+          let res = JSON.parse(evt.target.result);
+          console.log(res)
+          if (res.versao == 1) {
+            this.carregarV1(res)
+          }
+        }
+        reader.onerror = evt => {
+          console.error(evt);
+        }
+
+        this.$refs.myFile.value = ''
+
+      },
+      salvar() {
+        this.poste.versao = 1
+        const data = JSON.stringify(this.poste)
+        const blob = new Blob([data], {
+          type: 'text/plain'
+        })
+        const e = document.createEvent('MouseEvents'),
+          a = document.createElement('a');
+        a.download = `${this.poste.numero}.json`;
+        a.href = window.URL.createObjectURL(blob);
+        a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+        e.initEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        a.dispatchEvent(e);
+      },
+      limpar() {
+         this.poste ={
+          numero: '',
+          modelo: postesLib[0],
+          forcas: [
+            this.p0()
+          ]
+        }
       }
     }
   }
@@ -764,4 +836,5 @@
   tr {
     border: 1px solid #000;
   }
+
 </style>
