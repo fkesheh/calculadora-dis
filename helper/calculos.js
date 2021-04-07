@@ -1,4 +1,6 @@
-export const fnMemoriaDeCalculo = (poste, separator, tipos, vento) => {
+import tiposLib from '../libs/tipos'
+
+export const fnMemoriaDeCalculo = (poste, separator, vento) => {
     let texto = [];
 
 
@@ -18,7 +20,7 @@ export const fnMemoriaDeCalculo = (poste, separator, tipos, vento) => {
       p.deriv.tracao = parseFloat(p.deriv.tracao)
       p.deriv.h = parseFloat(p.deriv.h)
 
-      texto.push(`<strong>Componente ${i+1} - ${tipos[p.tipo]}</strong>`)
+      texto.push(`<strong>Componente ${i+1} - ${tiposLib[p.tipo]}</strong>`)
       if ((p.tipo == 'AT' || p.tipo == 'BT') && p.cabo && p.cabo.tracao) {
         if (p.cabo.multiplos) {
           texto.push(`Cabo: ${p.qtCabos} x ${p.cabo.nome} - Norma ${p.cabo.norma}`)
