@@ -16,7 +16,7 @@
 
         <b-form-group id="input-group-tipo" label="Tipo:" label-for="input-tipo" label-size="sm" label-align="left"
           label-class="mb-0" class="mb-1">
-          <b-form-select v-model="ponto.tipo" class="mb-0" id="input-tipo" @change="atualizarAltura(ponto)">
+          <b-form-select v-model="ponto.tipo" class="mb-0" id="input-tipo" @change="changeTipo(ponto)">
             <b-form-select-option value="AT">Alta Tensão</b-form-select-option>
             <b-form-select-option value="BT">Baixa Tensão</b-form-select-option>
             <b-form-select-option value="FCTE">Fibra Optica Copel</b-form-select-option>
@@ -121,11 +121,11 @@
       </b-card-text>
 
       <template #footer>
-        <label>Momento X: {{ fnVetorTracao(ponto).x.toFixed(2) }}
+        <label>Momento X: {{ fnVetorMomento(ponto).x.toFixed(2) }}
           daN.m</label>
-        <label>Momento Y: {{ fnVetorTracao(ponto).y.toFixed(2) }}
+        <label>Momento Y: {{ fnVetorMomento(ponto).y.toFixed(2) }}
           daN.m</label>
-        <label>Resultante: {{ fnVetorTracao(ponto).mod.toFixed(2) }}
+        <label>Resultante: {{ fnVetorMomento(ponto).mod.toFixed(2) }}
           daN.m</label>
       </template>
     </b-card>
@@ -137,7 +137,7 @@
  import tiposLib from '../libs/tipos.js';
   import postesLib from '../libs/postes.js';
   import fibrasLib from '../libs/fibras.js';
-  import { fnMemoriaDeCalculo, fnCalculaVento, fnCalculaVentoPoste, fnCalculaVentoTrafo, fnAlturaPadrao, fnRebaterAo1Q, fnResultante, fnVetorTracao, fnMomentoResistente } from '../helper/calculos'
+  import { fnMemoriaDeCalculo, fnCalculaVento, fnCalculaVentoPoste, fnCalculaVentoTrafo, fnAlturaPadrao, fnRebaterAo1Q, fnResultante, fnVetorMomento, fnMomentoResistente } from '../helper/calculos'
 
 export default {
 props: {
@@ -159,9 +159,15 @@ props: {
       }
     },
     methods: {
-            fnVetorTracao(p){
-        return fnVetorTracao(p)
+            fnVetorMomento(p){
+        return fnVetorMomento(p)
       },
+      changeTipo(ponto) {
+        this.$emit("atualizarAltura", ponto)
+      },
+      deletar(index) {
+        this.$emit("deletar", index)
+      }
     }
 }
 </script>

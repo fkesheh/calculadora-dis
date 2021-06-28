@@ -20,11 +20,19 @@
           </b-form-select>
         </b-form-group>
 
+        <b-form-group id="input-group-rotacaoPoste" label="Rotação Poste (graus):"
+           label-size="sm" label-align="left" label-class="mb-0" class="mb-1">
+          <b-form-input type="number" step="1" v-model="poste.rotacao" class="mb-0" />
+        </b-form-group>
+
+
         <div>
           <label>Componentes</label><br>
 
           <div class="row">
-              <Forca :ponto="ponto" :index="index"  v-for="(ponto, index) in poste.forcas" v-bind:key="index"/>
+              <Forca :ponto="ponto" :index="index"  v-for="(ponto, index) in poste.forcas" v-bind:key="index"
+              @atualizarAltura="atualizarAltura" @deletar="deletar"            
+              />
           </div>
 
           <b-button variant="outline-primary" @click="adicionarComponente">Adicionar Componente</b-button>
@@ -36,16 +44,13 @@
             </template>
             <b-card-text>
               <div class="row">
-
-
                 <div class="col-12 col-md-6 col-lg-6">
                   <vue-p5 @setup="setup" @draw="draw">
                   </vue-p5>
-
                 </div>
 
                 <div class="col-12 col-md-6 col-lg-6">
-                  <label>Tração dos Cabos e Equipamentos: {{ resultanteTracao.toFixed(2) }}
+                  <label>Momento dos Cabos e Equipamentos: {{ resultanteTracao.toFixed(2) }}
                     daN.m</label>
                   <br>
                   <label>Vento Nos Cabos de Telecom: {{ resultanteVentoNosCabos.toFixed(2) }} daN.m</label>
@@ -61,7 +66,6 @@
                   <b-button :variant="momentoTotal>momentoResistente ? 'danger' : 'success'">
                     {{ momentoTotal>momentoResistente ? `Poste ${this.poste.modelo.nome} Instável` : `Poste ${this.poste.modelo.nome} Estável` }}
                   </b-button>
-
                 </div>
               </div>
             </b-card-text>
@@ -101,7 +105,7 @@
   import cabosLib from '../libs/cabos.js';
   import postesLib from '../libs/postes.js';
   import fibrasLib from '../libs/fibras.js';
-  import { fnMemoriaDeCalculo, fnCalculaVento, fnCalculaVentoPoste, fnCalculaVentoTrafo, fnAlturaPadrao, fnRebaterAo1Q, fnResultante, fnVetorTracao, fnMomentoResistente } from '../helper/calculos'
+  import { fnMemoriaDeCalculo, fnCalculaVento, fnCalculaVentoPoste, fnCalculaVentoTrafo, fnAlturaPadrao, fnRebaterAo1Q, fnResultante, fnVetorMomento, fnMomentoResistente } from '../helper/calculos'
   import { drawSetup, drawLoop } from '../helper/draw'
   import Forca from '../components/Forca'
   export default {
@@ -120,6 +124,7 @@
         postes: postesLib,
         poste: {
           numero: '',
+          rotacao: 0,
           modelo: postesLib[0],
           forcas: [
             this.p0()
@@ -173,8 +178,8 @@
       isNumeric(n) {
         return !isNaN(parseFloat(n)) && isFinite(n);
       },
-      fnVetorTracao(p){
-        return fnVetorTracao(p)
+      fnVetorMomento(p){
+        return fnVetorMomento(p)
       },
       p0() {
         return {
@@ -241,6 +246,8 @@
      
       carregarV1(res) {
         this.poste = res
+        if(!this.poste.rotacao) 
+          this.poste.rotacao = 0
       },
       carregar() {
         this.$refs.myFile.click()

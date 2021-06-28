@@ -28,13 +28,13 @@ export const fnMemoriaDeCalculo = (poste, separator, vento) => {
             `Tração de acordo com norma: ${p.cabo.tracao.toFixed(2)} x ${p.qtCabos} = ${(p.cabo.tracao * p.qtCabos).toFixed(2)} daN`
           )
           texto.push(
-            `Momento: ${(p.cabo.tracao * p.qtCabos).toFixed(2)} x ${p.altura.toFixed(2)} = ${(p.cabo.tracao * p.qtCabos * p.altura).toFixed(2)} daN.m - Ângulo: ${p.angulo.toFixed(2)}`
+            `Momento: ${(p.cabo.tracao * p.qtCabos).toFixed(2)} x ${p.altura.toFixed(2)} = ${(p.cabo.tracao * p.qtCabos * p.altura).toFixed(2)} daN.m - Ângulo: ${p.angulo.toFixed(2)}°`
           )
         } else {
           texto.push(`Cabo: ${p.cabo.nome} - Norma ${p.cabo.norma}`)
           texto.push(`Tração de acordo com norma: ${p.cabo.tracao.toFixed(2)} daN`)
           texto.push(
-            `Momento: Tração x Altura ${p.cabo.tracao.toFixed(2)} x ${p.altura.toFixed(2)} = ${(p.cabo.tracao * p.altura).toFixed(2)} daN.m - Ângulo: ${p.angulo.toFixed(2)}`
+            `Momento: Tração x Altura ${p.cabo.tracao.toFixed(2)} x ${p.altura.toFixed(2)} = ${(p.cabo.tracao * p.altura).toFixed(2)} daN.m - Ângulo: ${p.angulo.toFixed(2)}°`
           )
         }
         texto.push(`Cálculo já considera o esforço do vento`)
@@ -47,18 +47,21 @@ export const fnMemoriaDeCalculo = (poste, separator, vento) => {
           texto.push(
             `Cabo: ${p.qtCabos} x ${p.cabo.nome} - Densidade Linear ${p.cabo.densidadeLinear.toFixed(3)} kg/m - Diâmetro: ${p.cabo.diametro.toFixed(3)} m`
           )
+          let tracao = (p.qtCabos * p.cabo.densidadeLinear * p.vaoRegulador ** 2) / (8* 0.01 * p.vaoRegulador)
+
           texto.push(
-            `Tração: ${p.qtCabos} x Densidade x Vão² / 8 x flecha(1%) = ${p.qtCabos} x ${p.cabo.densidadeLinear.toFixed(3)} x ${p.vaoRegulador.toFixed(2)}² / ( 8 x 0,01 x ${p.vaoRegulador.toFixed(2)}) = ${(p.qtCabos * p.cabo.densidadeLinear * p.vaoRegulador ** 2 / (8* 0.01 * p.vaoRegulador)).toFixed(2)} daN`
+            `Tração: ${p.qtCabos} x Densidade x Vão² / 8 x flecha(1%) = ${p.qtCabos} x ${p.cabo.densidadeLinear.toFixed(3)} x ${p.vaoRegulador.toFixed(2)}² / ( 8 x 0,01 x ${p.vaoRegulador.toFixed(2)}) = ${tracao.toFixed(2)} kgf = ${(tracao * 0.980665).toFixed(2)} daN`
           )
           texto.push(
-            `Momento: Tração x Altura = ${(p.qtCabos * p.cabo.densidadeLinear * p.vaoRegulador ** 2 / (8* 0.01 * p.vaoRegulador)).toFixed(2)} x ${p.altura.toFixed(2)} = ${(fnCalculaTracao(p)).toFixed(2)} daN.m - Ângulo: ${p.angulo.toFixed(2)}`
+            
+            `Momento: Tração x Altura = ${(tracao * 0.980665).toFixed(2)} x ${p.altura.toFixed(2)} = ${(fnCalculaMomento(p)).toFixed(2)} daN.m - Ângulo: ${p.angulo.toFixed(2)}°`
           )
         }
         texto.push(
           `Pressão do Vento (Pv):  k x Vento² = 0.00471 x ${vento}² = ${(0.00471 * (vento ** 2)).toFixed(3)} daN / m²`
         )
         texto.push(
-          `Ângulo do Vento (Pior Caso): ${Math.abs(resultanteVentoNosCabos.angulo-p.angulo).toFixed(2)}`
+          `Ângulo do Vento (Pior Caso): ${Math.abs(resultanteVentoNosCabos.angulo-p.angulo).toFixed(2)}°`
         )
         texto.push(
           `Força do Vento: Pv x (Vão/2) x Diametro x sen(AnguloAtaque) = ${(0.00471 * (vento ** 2)).toFixed(3)} x (${p.vaoRegulador} / 2) x ${p.cabo.diametro} x sen(${Math.abs(resultanteVentoNosCabos.angulo-p.angulo)}) = ${((0.00471 * (vento ** 2))*(p.vaoRegulador/2)*p.cabo.diametro*Math.sin(Math.abs(resultanteVentoNosCabos.angulo-p.angulo) * Math.PI / 180.0)).toFixed(2)} daN`
@@ -69,7 +72,7 @@ export const fnMemoriaDeCalculo = (poste, separator, vento) => {
       }
       if (p.tipo == 'TRAFO' || p.tipo == 'LUMINARIA' || p.tipo == 'CHAVE') {
         texto.push(
-          `Momento: Peso x Distância = ${p.equip.peso.toFixed(2)} x ${p.equip.d.toFixed(2)} = ${(p.equip.peso * p.equip.d).toFixed(2)} daN.m  - Ângulo: ${p.angulo.toFixed(2)}`
+          `Momento: Peso x Distância = ${p.equip.peso.toFixed(2)} x ${p.equip.d.toFixed(2)} = ${(p.equip.peso * p.equip.d).toFixed(2)} daN.m  - Ângulo: ${p.angulo.toFixed(2)}°`
         )
       }
       let resultanteVentoNoTrafo = 0
@@ -85,7 +88,7 @@ export const fnMemoriaDeCalculo = (poste, separator, vento) => {
       }
       if (p.tipo == 'DERIVACAO') {
         texto.push(
-          `Momento: Tração x Altura = ${p.deriv.tracao.toFixed(2)} x ${p.deriv.h.toFixed(2)} = ${(p.deriv.tracao * p.deriv.h).toFixed(2)} daN.m  - Ângulo: ${p.angulo.toFixed(2)}`
+          `Momento: Tração x Altura = ${p.deriv.tracao.toFixed(2)} x ${p.deriv.h.toFixed(2)} = ${(p.deriv.tracao * p.deriv.h).toFixed(2)} daN.m  - Ângulo: ${p.angulo.toFixed(2)}°`
         )
       }
 
@@ -111,14 +114,14 @@ export const fnMemoriaDeCalculo = (poste, separator, vento) => {
     texto.push("<strong>Resultante dos Cabos e Equipamentos</strong>")
 
     poste.forcas.forEach((p, i) => {
-      let t = fnVetorTracao(p)
+      let t = fnVetorMomento(p)
       texto.push(
-        `Componente ${i+1}: ${t.mod.toFixed(2)} daN.m - Ângulo ${t.angulo.toFixed(2)} - X: ${t.x.toFixed(2)} - Y: ${t.y.toFixed(2)}`
+        `Componente ${i+1}: ${t.mod.toFixed(2)} daN.m - Ângulo ${t.angulo.toFixed(2)}° - X: ${t.x.toFixed(2)} - Y: ${t.y.toFixed(2)}`
       )
     })
     let res = fnResultante(poste);
     texto.push(
-      `Resultante: ${res.mod.toFixed(2)} daN.m - Ângulo ${res.angulo.toFixed(2)} - X: ${res.x.toFixed(2)} - Y: ${res.y.toFixed(2)}`
+      `Resultante: ${res.mod.toFixed(2)} daN.m - Ângulo ${res.angulo.toFixed(2)}° - X: ${res.x.toFixed(2)} - Y: ${res.y.toFixed(2)}`
     )
     texto.push(
       separator
@@ -159,13 +162,13 @@ export const fnMemoriaDeCalculo = (poste, separator, vento) => {
     if ((Math.abs(res.x) < 0.001 && Math.abs(res.y) < 0.001) || poste.modelo.classe == 'Circular') {
 
     } else {
-      let angReducao = fnRebaterAo1Q(res.angulo)
+      let angReducao = fnRebaterAo1Q(res.angulo - poste.rotacao)
       fr = 1.0329 * Math.exp(-0.00722 * angReducao);
       texto.push(
         `Fator de Redução: 1.0329 * EXP(-0.00722 * Angulo) = ${fr.toFixed(2)}`
       )
       texto.push(
-        `Ângulo: ${angReducao.toFixed(2)}`
+        `Ângulo: ${angReducao.toFixed(2)}° (Rotação do poste: ${poste.rotacao}°)`
       )
       texto.push(
         `Momento Resistente Final: ${(mrsa*fr).toFixed(2)} daN.m`
@@ -219,7 +222,7 @@ export const fnMemoriaDeCalculo = (poste, separator, vento) => {
     let x = 0;
     let y = 0;
     poste.forcas.forEach((ponto, i) => {
-      let t = fnVetorTracao(ponto)
+      let t = fnVetorMomento(ponto)
       x += t.x
       y += t.y
     })
@@ -231,8 +234,8 @@ export const fnMemoriaDeCalculo = (poste, separator, vento) => {
     }
   }
 
-  export const fnVetorTracao = (ponto) => {
-    let t = fnCalculaTracao(ponto)
+  export const fnVetorMomento = (ponto) => {
+    let t = fnCalculaMomento(ponto)
     return {
       x: (t * Math.cos(ponto.angulo * Math.PI / 180)),
       y: (t * Math.sin(ponto.angulo * Math.PI / 180)),
@@ -241,7 +244,7 @@ export const fnMemoriaDeCalculo = (poste, separator, vento) => {
     }
   }
 
-  let fnCalculaTracao = (ponto) => {
+  let fnCalculaMomento = (ponto) => {
 
     if (ponto.tipo == 'TRAFO' || ponto.tipo == 'LUMINARIA' || ponto.tipo == 'CHAVE') {
       return ponto.equip.peso * ponto.equip.d
@@ -320,7 +323,7 @@ export const fnMemoriaDeCalculo = (poste, separator, vento) => {
       if (res.x < 0.001 && res.y < 0.001) {
 
       } else {
-        let angReducao = fnRebaterAo1Q(res.angulo)
+        let angReducao = fnRebaterAo1Q(res.angulo - poste.rotacao)
         fr = 1.0329 * Math.exp(-0.00722 * angReducao);
       }
     }

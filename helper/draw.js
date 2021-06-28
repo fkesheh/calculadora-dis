@@ -1,4 +1,4 @@
-import { fnCalculaVento, fnCalculaVentoPoste, fnCalculaVentoTrafo, fnResultante, fnVetorTracao } from './calculos'
+import { fnCalculaVento, fnCalculaVentoPoste, fnCalculaVentoTrafo, fnResultante, fnVetorMomento } from './calculos'
 
 
 export const drawSetup = (sketch, w, h) => {
@@ -11,7 +11,7 @@ export const drawSetup = (sketch, w, h) => {
     let maxMod = 0
     let ts = []
     poste.forcas.forEach((p, i) => {
-      let t = fnVetorTracao(p)
+      let t = fnVetorMomento(p)
       ts.push(t)
       if (maxMod < t.mod) maxMod = t.mod
     })
@@ -27,9 +27,12 @@ export const drawSetup = (sketch, w, h) => {
     sketch.fill(200)
     sketch.stroke(200)
     if (poste.modelo.classe == 'Duplo-T') {
+      sketch.push()
+      sketch.rotate(-poste.rotacao * Math.PI / 180.0)
       sketch.rect(5, -10, 10, 20)
       sketch.rect(-15, -10, 10, 20)
       sketch.rect(-5, -5, 10, 10)
+      sketch.pop()
     } else {
       sketch.ellipse(0, 0, 20, 20)
     }
