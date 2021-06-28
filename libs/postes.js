@@ -219,4 +219,69 @@ export default [{
     classe: 'Duplo-T',
     nome: 'Tipo B - 600 daN - 18 m'
   },
+  {
+    codigo: 'NBR8451-C14',
+    NTC: 'NBR8451',
+    tipo: 'C14',
+    carga: 150,
+    altura: 10.5,
+    alturaUtil: 10.5,
+    topo: 0.14,
+    base: 0.35,
+    k: 0.00471,
+    classe: 'Circular',
+    nome: 'Tipo C14 - 150 daN - 10.5 m'
+  },
+  {
+    codigo: 'NBR8451-C17',
+    NTC: 'NBR8451',
+    tipo: 'C17',
+    carga: 300,
+    altura: 10.5,
+    alturaUtil: 10.5,
+    topo: 0.17,
+    base: 0.38,
+    k: 0.00471,
+    classe: 'Circular',
+    nome: 'Tipo C17 - 300 daN - 10.5 m'
+  },
+  {
+    codigo: 'NBR8451-C19',
+    NTC: 'NBR8451',
+    tipo: 'C19',
+    carga: 600,
+    altura: 10.5,
+    alturaUtil: 10.5,
+    topo: 0.19,
+    base: 0.40,
+    k: 0.00471,
+    classe: 'Circular',
+    nome: 'Tipo C19 - 600 daN - 10.5 m'
+  },
+  {
+    codigo: 'NBR8451-C21-20000382',
+    NTC: 'NBR8451',
+    tipo: 'C21',
+    carga: 1000,
+    altura: 10.5,
+    alturaUtil: 10.5,
+    topo: 0.21,
+    base: 0.42,
+    k: 0.00471,
+    classe: 'Circular',
+    nome: 'Tipo C21 - 1000 daN - 10.5 m'
+  },
+  {
+    codigo: 'NBR8451-C23',
+    NTC: 'NBR8451',
+    tipo: 'C23',
+    carga: 1000,
+    altura: 10.5,
+    alturaUtil: 10.5,
+    topo: 0.23,
+    base: 0.44,
+    k: 0.00471,
+    classe: 'Circular',
+    nome: 'Tipo C23 - 1000 daN - 10.5 m'
+  }
 ]
